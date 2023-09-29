@@ -21,6 +21,11 @@ const DISMISS_ALL = 'dismiss_all';
 
 let id = 1;
 
+interface IBag {
+  className: string;
+  position: string;
+}
+
 export const positions = {
   TOP: 'top',
   TOP_RIGHT: 'topRight',
@@ -106,6 +111,11 @@ const defaultConfig = {
   position: positions.BOTTOM_RIGHT,
 };
 
+const bags: IBag[] = Object.values(positions).map(position => ({
+  className: '',
+  position,
+}));
+
 function NotifierContextProvider({ children, config: overrideConfig = {} }) {
   const config = useMemo(() => ({ ...defaultConfig, ...overrideConfig }), [
     overrideConfig,
@@ -113,29 +123,6 @@ function NotifierContextProvider({ children, config: overrideConfig = {} }) {
   const { notifications, notify, dismiss, dismissAll } = useNotifications(
     config,
   );
-
-  const NotificationBagEx = ({className, position}) => {
-    return (
-      <NotificationBag
-        className={className}
-        notifications={notifications[position]}
-        max={config.max}
-      >
-        {notifications => {
-          return notifications.map(({ id, children, duration }) => (
-            <NotificationWrapper
-              key={id}
-              duration={duration}
-              onDismiss={() => dismiss(id)}
-              position={position}
-            >
-              {children}
-            </NotificationWrapper>
-          ));
-        }}
-      </NotificationBag>
-    );
-  };
 
   return (
     <NotifierContext.Provider
@@ -145,36 +132,25 @@ function NotifierContextProvider({ children, config: overrideConfig = {} }) {
       }}
     >
       {children}
-
-      <NotificationBagEx
-        className="react-headless-notifier-fixed react-headless-notifier-top-0 react-headless-notifier-left-0 react-headless-notifier-m-8"
-        position={positions.TOP_LEFT}
-      />
-
-      <NotificationBagEx
-        className="react-headless-notifier-fixed react-headless-notifier-top-0 react-headless-notifier-right-0 react-headless-notifier-m-8"
-        position={positions.TOP_RIGHT}
-      />
-
-      <NotificationBagEx
-        className="react-headless-notifier-fixed react-headless-notifier-top-0 react-headless-notifier-right-0 react-headless-notifier-left-0 react-headless-notifier-flex react-headless-notifier-flex-col-reverse react-headless-notifier-items-center"
-        position={positions.TOP}
-      />
-
-      <NotificationBagEx
-        className="react-headless-notifier-fixed react-headless-notifier-bottom-0 react-headless-notifier-right-0 react-headless-notifier-left-0 react-headless-notifier-flex react-headless-notifier-flex-col react-headless-notifier-items-center"
-        position={positions.BOTTOM}
-      />
-
-      <NotificationBagEx
-        className="react-headless-notifier-fixed react-headless-notifier-bottom-0 react-headless-notifier-left-0 react-headless-notifier-m-8"
-        position={positions.BOTTOM_LEFT}
-      />
-
-      <NotificationBagEx
-        className="react-headless-notifier-fixed react-headless-notifier-bottom-0 react-headless-notifier-right-0 react-headless-notifier-m-8"
-        position={positions.BOTTOM_RIGHT}
-      />
+      {bags.map(({ className, position }) => (
+        <NotificationBag
+          className={className}
+          notifications={notifications[position]}
+          max={config.max}
+        >
+          {notifications => {
+            return notifications.map(({ id, children, duration }) => (
+              <NotificationWrapper
+                key={id}
+                duration={duration}
+                onDismiss={() => dismiss(id)}
+              >
+                {children}
+              </NotificationWrapper>
+            ));
+          }}
+        </NotificationBag>
+      ))}
     </NotifierContext.Provider>
   );
 }
@@ -189,39 +165,7 @@ function NotificationBag({ className, notifications, max = null, children }) {
   return <div className={className}>{children(displayedNotifications)}</div>;
 }
 
-const animations = {
-  [positions.TOP]: {
-    enter: 'react-headless-notifier-animate-enter-top',
-    exit: 'react-headless-notifier-animate-exit-top',
-  },
-  [positions.TOP_RIGHT]: {
-    enter: 'react-headless-notifier-animate-enter-right',
-    exit: 'react-headless-notifier-animate-exit-right',
-  },
-  [positions.TOP_LEFT]: {
-    enter: 'react-headless-notifier-animate-enter-left',
-    exit: 'react-headless-notifier-animate-exit-left',
-  },
-  [positions.BOTTOM]: {
-    enter: 'react-headless-notifier-animate-enter-bottom',
-    exit: 'react-headless-notifier-animate-exit-bottom',
-  },
-  [positions.BOTTOM_RIGHT]: {
-    enter: 'react-headless-notifier-animate-enter-right',
-    exit: 'react-headless-notifier-animate-exit-right',
-  },
-  [positions.BOTTOM_LEFT]: {
-    enter: 'react-headless-notifier-animate-enter-left',
-    exit: 'react-headless-notifier-animate-exit-left',
-  },
-};
-
-function NotificationWrapper({
-  children,
-  duration,
-  onDismiss: handleDismiss,
-  position,
-}) {
+function NotificationWrapper({ children, duration, onDismiss }) {
   const [active, setActive] = useState(true);
   const timer = useMemo(() => new Timer(() => setActive(false), duration), [
     duration,
@@ -230,23 +174,18 @@ function NotificationWrapper({
 
   useEffect(() => {
     return () => timer.clear();
-  }, []);
+  }, [timer]);
 
   useEffect(() => {
     running ? timer.resume() : timer.pause();
-  }, [running]);
-
-  const { enter, exit } = useMemo(() => animations[position], [position]);
+  }, [running, timer]);
 
   return (
     <div
       onMouseEnter={() => setRunning(false)}
       onMouseLeave={() => setRunning(true)}
-      className={`react-headless-notifier-mb-4 react-headless-notifier-transform-gpu react-headless-notifier-transition-all ${
-        active ? enter : exit
-      }`}
       onAnimationEnd={() => {
-        if (!active) handleDismiss();
+        if (!active) onDismiss();
       }}
     >
       {cloneElement(children, { id, dismiss: () => setActive(false) })}
