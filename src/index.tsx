@@ -8,7 +8,6 @@ import {
   useEffect,
   useMemo,
 } from 'react';
-import './index.css';
 import Timer from './Timer';
 
 const NotifierContext = createContext({
@@ -115,6 +114,29 @@ function NotifierContextProvider({ children, config: overrideConfig = {} }) {
     config,
   );
 
+  const NotificationBagEx = ({className, position}) => {
+    return (
+      <NotificationBag
+        className={className}
+        notifications={notifications[position]}
+        max={config.max}
+      >
+        {notifications => {
+          return notifications.map(({ id, children, duration }) => (
+            <NotificationWrapper
+              key={id}
+              duration={duration}
+              onDismiss={() => dismiss(id)}
+              position={position}
+            >
+              {children}
+            </NotificationWrapper>
+          ));
+        }}
+      </NotificationBag>
+    );
+  };
+
   return (
     <NotifierContext.Provider
       value={{
@@ -124,119 +146,35 @@ function NotifierContextProvider({ children, config: overrideConfig = {} }) {
     >
       {children}
 
-      <NotificationBag
+      <NotificationBagEx
         className="react-headless-notifier-fixed react-headless-notifier-top-0 react-headless-notifier-left-0 react-headless-notifier-m-8"
-        notifications={notifications[positions.TOP_LEFT]}
-        max={config.max}
-      >
-        {notifications => {
-          return notifications.map(({ id, children, duration }) => (
-            <NotificationWrapper
-              key={id}
-              duration={duration}
-              onDismiss={() => dismiss(id)}
-              position={positions.TOP_LEFT}
-            >
-              {children}
-            </NotificationWrapper>
-          ));
-        }}
-      </NotificationBag>
+        position={positions.TOP_LEFT}
+      />
 
-      <NotificationBag
+      <NotificationBagEx
         className="react-headless-notifier-fixed react-headless-notifier-top-0 react-headless-notifier-right-0 react-headless-notifier-m-8"
-        notifications={notifications[positions.TOP_RIGHT]}
-        max={config.max}
-      >
-        {notifications => {
-          return notifications.map(({ id, children, duration }) => (
-            <NotificationWrapper
-              key={id}
-              duration={duration}
-              onDismiss={() => dismiss(id)}
-              position={positions.TOP_RIGHT}
-            >
-              {children}
-            </NotificationWrapper>
-          ));
-        }}
-      </NotificationBag>
+        position={positions.TOP_RIGHT}
+      />
 
-      <NotificationBag
+      <NotificationBagEx
         className="react-headless-notifier-fixed react-headless-notifier-top-0 react-headless-notifier-right-0 react-headless-notifier-left-0 react-headless-notifier-flex react-headless-notifier-flex-col-reverse react-headless-notifier-items-center"
-        notifications={notifications[positions.TOP]}
-        max={config.max}
-      >
-        {notifications => {
-          return notifications.map(({ id, children, duration }) => (
-            <NotificationWrapper
-              position={positions.TOP}
-              key={id}
-              duration={duration}
-              onDismiss={() => dismiss(id)}
-            >
-              {children}
-            </NotificationWrapper>
-          ));
-        }}
-      </NotificationBag>
+        position={positions.TOP}
+      />
 
-      <NotificationBag
+      <NotificationBagEx
         className="react-headless-notifier-fixed react-headless-notifier-bottom-0 react-headless-notifier-right-0 react-headless-notifier-left-0 react-headless-notifier-flex react-headless-notifier-flex-col react-headless-notifier-items-center"
-        notifications={notifications[positions.BOTTOM]}
-        max={config.max}
-      >
-        {notifications => {
-          return notifications.map(({ id, children, duration }) => (
-            <NotificationWrapper
-              position={positions.BOTTOM}
-              key={id}
-              duration={duration}
-              onDismiss={() => dismiss(id)}
-            >
-              {children}
-            </NotificationWrapper>
-          ));
-        }}
-      </NotificationBag>
+        position={positions.BOTTOM}
+      />
 
-      <NotificationBag
+      <NotificationBagEx
         className="react-headless-notifier-fixed react-headless-notifier-bottom-0 react-headless-notifier-left-0 react-headless-notifier-m-8"
-        notifications={notifications[positions.BOTTOM_LEFT]}
-        max={config.max}
-      >
-        {notifications => {
-          return notifications.map(({ id, children, duration }) => (
-            <NotificationWrapper
-              key={id}
-              duration={duration}
-              onDismiss={() => dismiss(id)}
-              position={positions.BOTTOM_LEFT}
-            >
-              {children}
-            </NotificationWrapper>
-          ));
-        }}
-      </NotificationBag>
+        position={positions.BOTTOM_LEFT}
+      />
 
-      <NotificationBag
+      <NotificationBagEx
         className="react-headless-notifier-fixed react-headless-notifier-bottom-0 react-headless-notifier-right-0 react-headless-notifier-m-8"
-        notifications={notifications[positions.BOTTOM_RIGHT]}
-        max={config.max}
-      >
-        {notifications => {
-          return notifications.map(({ id, children, duration }) => (
-            <NotificationWrapper
-              key={id}
-              duration={duration}
-              onDismiss={() => dismiss(id)}
-              position={positions.BOTTOM_RIGHT}
-            >
-              {children}
-            </NotificationWrapper>
-          ));
-        }}
-      </NotificationBag>
+        position={positions.BOTTOM_RIGHT}
+      />
     </NotifierContext.Provider>
   );
 }
