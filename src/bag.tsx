@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
   cloneElement,
   FC,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -16,7 +17,14 @@ export const NotificationBag: FC<{
   duration?: number;
   max?: number;
   onDismiss?: (id: string) => void;
-}> = ({ position, duration = DEFAULT_DURATION, max = null, onDismiss }) => {
+  children?: (rendered: ReactNode) => ReactNode;
+}> = ({
+  position,
+  duration = DEFAULT_DURATION,
+  max = null,
+  onDismiss,
+  children = i => i,
+}) => {
   const { notifications, dismiss } = useNotifier();
   const bag = notifications[position || ''] ?? [];
 
@@ -26,23 +34,25 @@ export const NotificationBag: FC<{
     return filtered;
   }, [bag, max]);
 
-  return (
+  return displayedNotifications.length ? (
     <>
-      {displayedNotifications.map(
-        ({ id, children, duration: overrideDuration }) => (
-          <NotificationWrapper
-            key={id}
-            duration={overrideDuration ?? duration}
-            dismiss={dismiss}
-            onDismiss={onDismiss}
-            id={id}
-          >
-            {children}
-          </NotificationWrapper>
+      {children(
+        displayedNotifications.map(
+          ({ id, children, duration: overrideDuration }) => (
+            <NotificationWrapper
+              key={id}
+              duration={overrideDuration ?? duration}
+              dismiss={dismiss}
+              onDismiss={onDismiss}
+              id={id}
+            >
+              {children}
+            </NotificationWrapper>
+          ),
         ),
       )}
     </>
-  );
+  ) : null;
 };
 
 function NotificationWrapper({ children, duration, dismiss, onDismiss, id }) {

@@ -9,7 +9,9 @@ import {
 const App = () => {
   return (
     <NotifierContextProvider duration={10000}>
-      <div className="notification-bag-default"><NotificationBag /></div>
+      <NotificationBag>{
+        (children) => <div className="notification-bag-default">{children}</div>
+      }</NotificationBag>
       <ShowNotification />
       <div className="notification-bag-top"><NotificationBag position="TOP" /></div>
       <div className="notification-bag-bottom"><NotificationBag position="BOTTOM" /></div>
