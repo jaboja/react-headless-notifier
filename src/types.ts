@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 
 export interface INotifierContext {
   notifications: Record<string, ReadonlyArray<INotification>>;
-  notify: (children: ReactNode, overridePosition: string) => void;
+  notify: (children: ReactNode, overridePosition?: string) => void;
   dismiss: (id: string) => void;
   dismissAll: () => void;
 }

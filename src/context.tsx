@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, FC, ReactNode, useContext } from 'react';
 import { useNotifications } from './reducer';
 import { INotifierContext } from './types';
 
@@ -14,7 +14,10 @@ export function useNotifier(): INotifierContext {
   return useContext(NotifierContext);
 }
 
-export function NotifierContextProvider({ children, position }): ReactNode {
+export const NotifierContextProvider: FC<{
+  children: ReactNode;
+  position?: string;
+}> = ({ children, position }) => {
   const notifications = useNotifications(position ?? 'default');
 
   return (
@@ -22,4 +25,4 @@ export function NotifierContextProvider({ children, position }): ReactNode {
       {children}
     </NotifierContext.Provider>
   );
-}
+};

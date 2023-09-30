@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { cloneElement, useEffect, useMemo, useState } from 'react';
+import { cloneElement, FC, useEffect, useMemo, useState } from 'react';
 import { useNotifier } from './context';
 import Timer from './Timer';
 
-export function NotificationBag({
-  position = 'default',
-  duration = 0,
-  max = null,
-  onDismiss,
-}) {
+export const NotificationBag: FC<{
+  position?: string;
+  duration?: number;
+  max?: number;
+  onDismiss?: (id: string) => void;
+}> = ({ position = 'default', duration = 0, max = null, onDismiss }) => {
   const { notifications, dismiss } = useNotifier();
   const bag = notifications[position] ?? [];
 
@@ -16,18 +16,22 @@ export function NotificationBag({
     return max ? bag.slice(Math.max(bag.length - max, 0)) : bag;
   }, [bag, max]);
 
-  return displayedNotifications.map(({ id, children }) => (
-    <NotificationWrapper
-      key={id}
-      duration={duration}
-      dismiss={dismiss}
-      onDismiss={onDismiss}
-      id={id}
-    >
-      {children}
-    </NotificationWrapper>
-  ));
-}
+  return (
+    <>
+      {displayedNotifications.map(({ id, children }) => (
+        <NotificationWrapper
+          key={id}
+          duration={duration}
+          dismiss={dismiss}
+          onDismiss={onDismiss}
+          id={id}
+        >
+          {children}
+        </NotificationWrapper>
+      ))}
+    </>
+  );
+};
 
 function NotificationWrapper({ children, duration, dismiss, onDismiss, id }) {
   const timer = useMemo(
