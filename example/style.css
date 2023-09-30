@@ -1,5 +1,136 @@
-@tailwind base;
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font: normal 12px/1.2em Tahoma, Helvetica, Arial, sans-serif;
+}
+#root {
+  display: flex;
+  flex-direction: column;
+}
 
-@tailwind components;
+.button-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  margin-bottom: 38%;
+}
 
-@tailwind utilities;
+.notification-bag-default {
+  padding: 10px;
+}
+
+.notification-bag-top,
+.notification-bag-bottom,
+.notification-bag-bottom-left {
+  position: fixed;
+  z-index: 9999;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.notification-bag-top {
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.notification-bag-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.notification-bag-bottom-left {
+  bottom: 0;
+  left: 0;
+  align-items: flex-start;
+}
+
+
+.notification,
+.button-area button,
+.button-area hr {
+  border: 1px solid #555;
+  background: #eee;
+  border-radius: 5px;
+  margin: 5px;
+  width: fit-content;
+}
+
+.button-area button,
+.button-area hr {
+  width: 168px;
+  padding: 3px;
+}
+
+.button-area hr {
+  padding: 0;
+  border-bottom: none;
+}
+
+.notification {
+  padding: 10px;
+  position: relative;
+  pointer-events: all;
+}
+
+.notification p,
+.notification h4 {
+  margin: 0 0 .5em;
+}
+
+.notification button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  overflow: hidden;
+
+  display: block;
+  border: none;
+  border-radius: 3px;
+  background: currentColor;
+  color: inherit;
+}
+.notification button::before {
+  content: '×';
+  display: block;
+  text-align: center;
+  font-weight: bold;
+  color: #fff;
+  line-height: 1.05em;
+}
+
+.notification-red {
+  color: #800;
+  background: #fee;
+  border-color: #c00;
+}
+
+.notification-green {
+  color: #050;
+  background: #efe;
+  border-color: #5b5;
+}
+
+.notification-blue {
+  color: #11a;
+  background: #eef;
+  border-color: #55f;
+}
+
+.notification-yellow {
+  color: #550;
+  background: #ffc;
+  border-color: #aa0;
+}
