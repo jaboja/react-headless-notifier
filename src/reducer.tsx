@@ -19,21 +19,21 @@ let id = 1;
 function reducer(state: TState, action: TAction): TState {
   switch (action.type) {
     case NotificationType.ADD:
+      const key = action.notification.position;
       return {
         ...state,
-        [action.notification.position]: [
-          ...state[action.notification.position],
-          action.notification,
-        ],
+        [key]: [...(state[key] || []), action.notification],
       };
     case NotificationType.DISMISS:
       // we extract the position from the `id`
       const id = action.notification.id;
       const position = id.replace(/-\d+$/, '');
-      return {
-        ...state,
-        [position]: state[position].filter(item => item.id !== id),
-      };
+      return state[position]
+        ? {
+            ...state,
+            [position]: state[position].filter(item => item.id !== id),
+          }
+        : state;
     case NotificationType.DISMISS_ALL:
       return {};
     default:
@@ -63,7 +63,7 @@ export function useNotifications(defaultPosition: string): INotifierContext {
     });
   };
 
-  const dismiss = id => {
+  const dismiss = (id: string) => {
     dispatch({ type: NotificationType.DISMISS, notification: { id } });
   };
 

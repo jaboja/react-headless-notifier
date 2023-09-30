@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { cloneElement, FC, useEffect, useMemo, useState } from 'react';
+import {
+  cloneElement,
+  FC,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
 import { useNotifier } from './context';
 import Timer from './Timer';
 
@@ -8,12 +15,14 @@ export const NotificationBag: FC<{
   duration?: number;
   max?: number;
   onDismiss?: (id: string) => void;
-}> = ({ position = 'default', duration = 0, max = null, onDismiss }) => {
+}> = ({ position = 'default', duration = 5000, max = null, onDismiss }) => {
   const { notifications, dismiss } = useNotifier();
   const bag = notifications[position] ?? [];
 
   const displayedNotifications = useMemo(() => {
-    return max ? bag.slice(Math.max(bag.length - max, 0)) : bag;
+    const filtered = max ? bag.slice(Math.max(bag.length - max, 0)) : [...bag];
+    filtered.reverse();
+    return filtered;
   }, [bag, max]);
 
   return (
@@ -34,14 +43,15 @@ export const NotificationBag: FC<{
 };
 
 function NotificationWrapper({ children, duration, dismiss, onDismiss, id }) {
-  const timer = useMemo(
-    () =>
-      new Timer(async () => {
-        if (onDismiss) await onDismiss(id);
-        dismiss(id);
-      }, duration),
-    [duration, id, dismiss, onDismiss],
-  );
+  const dismissEx = useCallback(async () => {
+    if (onDismiss) await onDismiss(id);
+    dismiss(id);
+  }, [id, dismiss, onDismiss]);
+
+  const timer = useMemo(() => new Timer(dismissEx, duration), [
+    duration,
+    dismissEx,
+  ]);
   const [running, setRunning] = useState(true);
 
   useEffect(() => {
@@ -57,7 +67,7 @@ function NotificationWrapper({ children, duration, dismiss, onDismiss, id }) {
       onMouseEnter={() => setRunning(false)}
       onMouseLeave={() => setRunning(true)}
     >
-      {cloneElement(children, { dismiss })}
+      {cloneElement(children, { dismiss: dismissEx })}
     </div>
   );
 }
