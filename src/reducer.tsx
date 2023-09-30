@@ -41,11 +41,19 @@ function reducer(state: TState, action: TAction): TState {
   }
 }
 
-export function useNotifications(defaultPosition: string): INotifierContext {
+export function useNotifications(
+  defaultPosition: string,
+  defaultDuration?: number,
+): INotifierContext {
   const [notifications, dispatch] = useReducer(reducer, {});
 
-  const notify = (children: ReactNode, overridePosition?: string) => {
+  const notify = (
+    children: ReactNode,
+    overridePosition?: string,
+    overrideDuration?: number,
+  ) => {
     const position = overridePosition ?? defaultPosition;
+    const duration = overrideDuration ?? defaultDuration;
     const newId = id++;
 
     dispatch({
@@ -59,6 +67,7 @@ export function useNotifications(defaultPosition: string): INotifierContext {
         id: `${position}-${newId}`,
         children,
         position,
+        duration,
       },
     });
   };

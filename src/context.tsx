@@ -17,8 +17,9 @@ export function useNotifier(): INotifierContext {
 export const NotifierContextProvider: FC<{
   children: ReactNode;
   position?: string;
-}> = ({ children, position }) => {
-  const notifications = useNotifications(position ?? 'default');
+  duration?: number;
+}> = ({ children, position, duration }) => {
+  const notifications = useNotifications(position || '', duration);
 
   return (
     <NotifierContext.Provider value={notifications}>

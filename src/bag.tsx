@@ -2,22 +2,23 @@ import * as React from 'react';
 import {
   cloneElement,
   FC,
+  useCallback,
   useEffect,
   useMemo,
   useState,
-  useCallback,
 } from 'react';
 import { useNotifier } from './context';
 import Timer from './Timer';
+import { DEFAULT_DURATION } from './types';
 
 export const NotificationBag: FC<{
   position?: string;
   duration?: number;
   max?: number;
   onDismiss?: (id: string) => void;
-}> = ({ position = 'default', duration = 5000, max = null, onDismiss }) => {
+}> = ({ position, duration = DEFAULT_DURATION, max = null, onDismiss }) => {
   const { notifications, dismiss } = useNotifier();
-  const bag = notifications[position] ?? [];
+  const bag = notifications[position || ''] ?? [];
 
   const displayedNotifications = useMemo(() => {
     const filtered = max ? bag.slice(Math.max(bag.length - max, 0)) : [...bag];
@@ -27,17 +28,19 @@ export const NotificationBag: FC<{
 
   return (
     <>
-      {displayedNotifications.map(({ id, children }) => (
-        <NotificationWrapper
-          key={id}
-          duration={duration}
-          dismiss={dismiss}
-          onDismiss={onDismiss}
-          id={id}
-        >
-          {children}
-        </NotificationWrapper>
-      ))}
+      {displayedNotifications.map(
+        ({ id, children, duration: overrideDuration }) => (
+          <NotificationWrapper
+            key={id}
+            duration={overrideDuration ?? duration}
+            dismiss={dismiss}
+            onDismiss={onDismiss}
+            id={id}
+          >
+            {children}
+          </NotificationWrapper>
+        ),
+      )}
     </>
   );
 };

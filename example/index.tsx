@@ -8,7 +8,7 @@ import {
 
 const App = () => {
   return (
-    <NotifierContextProvider position="BOTTOM_RIGHT">
+    <NotifierContextProvider duration={1000}>
       <div className="notification-bag-default"><NotificationBag /></div>
       <ShowNotification />
       <div className="notification-bag-top"><NotificationBag position="TOP" /></div>

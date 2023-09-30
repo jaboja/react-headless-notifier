@@ -21,6 +21,9 @@ html, body, #root {
 .notification-bag-default {
   padding: 10px;
 }
+.notification-bag-default .notification {
+  width: auto;
+}
 
 .notification-bag-top,
 .notification-bag-bottom,
