@@ -46,16 +46,17 @@ export const NotificationBag: FC<{
 };
 
 function NotificationWrapper({ children, duration, dismiss, onDismiss, id }) {
+  const timer = useMemo(() => new Timer(duration), [duration]);
+  const [running, setRunning] = useState(true);
+
   const dismissEx = useCallback(async () => {
     if (onDismiss) await onDismiss(id);
     dismiss(id);
-  }, [id, dismiss, onDismiss]);
+  }, [dismiss, id, onDismiss]);
 
-  const timer = useMemo(() => new Timer(dismissEx, duration), [
-    duration,
-    dismissEx,
-  ]);
-  const [running, setRunning] = useState(true);
+  useEffect(() => {
+    timer.callback = dismissEx;
+  }, [timer, dismissEx]);
 
   useEffect(() => {
     return () => timer.clear();

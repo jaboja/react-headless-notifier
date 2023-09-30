@@ -1,8 +1,9 @@
 // inspired by: https://gist.github.com/ncou/3a0a1f89c8e22416d0d607f621a948a9
 
 export default class Timer {
-  constructor(private readonly callback, private readonly delay) {}
+  constructor(private readonly delay) {}
 
+  public callback: () => void = () => {};
   private timerId;
   private start;
   private remaining = this.delay;
@@ -12,7 +13,7 @@ export default class Timer {
 
     this.clear();
 
-    this.timerId = setTimeout(this.callback, this.remaining);
+    this.timerId = setTimeout(() => this.callback(), this.remaining);
 
     return this;
   }
